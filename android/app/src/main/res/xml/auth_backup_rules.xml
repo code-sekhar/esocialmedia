@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude domain="sharedpref" path="eastalya_auth.xml" />
+    <exclude domain="sharedpref" path="FlutterSecureStorageConfiguration:eastalya_auth.xml" />
+    <exclude domain="sharedpref" path="FlutterSecureKeyStorage:eastalya_auth.xml" />
+</full-backup-content>
