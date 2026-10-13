@@ -1,4 +1,5 @@
 import '../features/privacy/privacy_screen.dart';
+import '../features/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import '../core/auth/auth_scope.dart';
 import '../core/l10n/auth_copy.dart';
@@ -92,7 +93,7 @@ class _AccountScreenState extends State<AccountScreen> {
               style: const TextStyle(color: Colors.white70),
             ),
             const Text(
-              'Birth information is optional and private.',
+              'Create and verify your account first. Private astrology onboarding follows separately.',
               style: TextStyle(color: Colors.white70),
             ),
             if (error != null)
@@ -104,6 +105,17 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
               ),
             if (busy) const LinearProgressIndicator(),
+            TextButton(
+              onPressed: busy
+                  ? null
+                  : () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AstrologyOnboardingScreen(),
+                      ),
+                    ),
+              child: const Text('Astrology onboarding'),
+            ),
             TextButton(
               onPressed: busy
                   ? null
@@ -134,7 +146,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             const ProfileSettingsScreen(astrology: true),
                       ),
                     ),
-              child: const Text('Optional astrology & consent'),
+              child: const Text('Legacy astrology settings & consent'),
             ),
             TextButton(
               onPressed: busy ? null : _load,

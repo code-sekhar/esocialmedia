@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/auth/auth_models.dart';
 import '../../core/auth/auth_scope.dart';
 import '../../core/l10n/auth_copy.dart';
+import '../onboarding/onboarding_screen.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
   final bool astrology;
@@ -227,6 +228,18 @@ class _ProfileSettingsState extends State<ProfileSettingsScreen> {
       child: Scaffold(
         backgroundColor: const Color(0xFF0D0328),
         appBar: AppBar(
+          actions: [
+            IconButton(
+              tooltip: 'Astrology onboarding',
+              icon: const Icon(Icons.auto_awesome),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AstrologyOnboardingScreen(),
+                ),
+              ),
+            ),
+          ],
           title: Text(
             widget.astrology
                 ? AuthCopy.text('astrologyTitle')

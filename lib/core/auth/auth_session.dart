@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'auth_api.dart';
 import 'auth_models.dart';
 import 'refresh_store.dart';
+import 'private_api_error.dart';
 
 class AuthSession extends ChangeNotifier {
   final AuthApi api;
@@ -29,6 +30,7 @@ class AuthSession extends ChangeNotifier {
   int _epoch = 0;
   Future<void>? _flight;
   Future<void> _storage = Future.value();
+  int get identityEpoch => _epoch;
   bool get authenticated => _access != null && account != null;
   bool get supportsPersistence => store.persistent;
   Future<void> _store(Future<void> Function() work) {
@@ -211,6 +213,59 @@ class AuthSession extends ChangeNotifier {
     account = Account.fromJson(result);
     notifyListeners();
     return account!;
+  }
+
+  Future<Object?> privateRequest(
+    String path, {
+    Object? body,
+    String method = 'GET',
+  }) async {
+    await profile();
+    final epoch = _epoch, access = _access;
+    if (access == null) {
+      throw const PrivateApiFailure(401, 'SESSION_UNAVAILABLE');
+    }
+    try {
+      final result = await api.privateRequest(
+        path,
+        body: body,
+        method: method,
+        access: access,
+      );
+      if (epoch != _epoch) {
+        throw const PrivateApiFailure(401, 'SESSION_CHANGED');
+      }
+      return result;
+    } on PrivateApiFailure catch (error) {
+      if (epoch != _epoch) {
+        throw const PrivateApiFailure(401, 'SESSION_CHANGED');
+      }
+      if (error.status == 401) {
+        if (method == 'GET') {
+          try {
+            if (access == _access) await rotate();
+            if (epoch != _epoch || _access == null) {
+              throw const PrivateApiFailure(401, 'SESSION_CHANGED');
+            }
+            final result = await api.privateRequest(
+              path,
+              method: method,
+              access: _access!,
+            );
+            if (epoch != _epoch) {
+              throw const PrivateApiFailure(401, 'SESSION_CHANGED');
+            }
+            return result;
+          } on PrivateApiFailure catch (retry) {
+            if (epoch == _epoch && retry.status == 401) await clear();
+            rethrow;
+          }
+        }
+        // Mutations are never replayed following refresh or an uncertain response.
+        await clear();
+      }
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>> social(

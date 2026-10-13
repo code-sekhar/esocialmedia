@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import '../../app/constants/api_endpoints.dart';
 import 'auth_models.dart';
+import 'private_api_error.dart';
 
 class AuthApi {
   final Dio dio;
@@ -56,6 +57,27 @@ class AuthApi {
             ? AuthProblem.validation
             : AuthProblem.network,
       );
+    }
+  }
+
+  Future<Object?> privateRequest(
+    String path, {
+    Object? body,
+    required String method,
+    required String access,
+  }) async {
+    try {
+      final response = await dio.request<Object?>(
+        path,
+        data: body,
+        options: Options(
+          method: method,
+          headers: {'Authorization': 'Bearer $access'},
+        ),
+      );
+      return response.data;
+    } on DioException catch (error) {
+      throw PrivateApiFailure.from(error);
     }
   }
 

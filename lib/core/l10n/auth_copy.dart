@@ -11,7 +11,7 @@ class AuthCopy {
     'cancelDeletion': 'Cancel pending request',
     'refreshStatus': 'Refresh status',
     'profileTitle': 'Profile & privacy',
-    'astrologyTitle': 'Optional astrology',
+    'astrologyTitle': 'Legacy astrology settings',
     'saveProfile': 'Save changes',
     'withdrawAstrology': 'Withdraw astrology consent',
     'profileName': 'Display name',
@@ -45,7 +45,7 @@ class AuthCopy {
   static const translations = {
     'bn': {
       'profileTitle': "প্রোফাইল ও গোপনীয়তা",
-      'astrologyTitle': "ঐচ্ছিক জ্যোতিষ",
+      'astrologyTitle': "পুরোনো জ্যোতিষ সেটিংস",
       'saveProfile': "পরিবর্তন সংরক্ষণ করুন",
       'withdrawAstrology': "জ্যোতিষের সম্মতি প্রত্যাহার",
       'profileName': "প্রদর্শিত নাম",
@@ -65,7 +65,7 @@ class AuthCopy {
     },
     'hi': {
       'profileTitle': "प्रोफ़ाइल और गोपनीयता",
-      'astrologyTitle': "वैकल्पिक ज्योतिष",
+      'astrologyTitle': "पुरानी ज्योतिष सेटिंग्स",
       'saveProfile': "बदलाव सहेजें",
       'withdrawAstrology': "ज्योतिष की सहमति वापस लें",
       'profileName': "दिखने वाला नाम",
