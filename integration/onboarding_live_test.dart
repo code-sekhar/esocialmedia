@@ -38,7 +38,10 @@ void main() {
         final match = RegExp(
           r'>([0-9]{6})</',
         ).firstMatch(detail['HTML'] as String);
-        if (match != null) return match.group(1)!;
+        if (match != null) {
+          await Future<void>.delayed(const Duration(milliseconds: 250));
+          return match.group(1)!;
+        }
       }
       await Future<void>.delayed(const Duration(milliseconds: 100));
     }
@@ -200,6 +203,47 @@ void main() {
         await auth.logout();
         expect(c.draft, isNull);
         expect(c.notices, isEmpty);
+      } finally {
+        c.dispose();
+        auth.api.dio.close(force: true);
+        auth.dispose();
+      }
+    },
+  );
+  test(
+    'same synthetic account shares authoritative Angular state and Flutter mutation',
+    () async {
+      const file = String.fromEnvironment('D1_CLIENT_ENV');
+      if (!file.startsWith('/tmp/eastalya-d1-client-state-'))
+        throw StateError('Private isolated shared account file required');
+      final settings =
+          jsonDecode(await File(file).readAsString()) as Map<String, dynamic>;
+      final email = settings['email'] as String;
+      if (!email.endsWith('@example.invalid'))
+        throw StateError('Synthetic account required');
+      final auth = AuthSession(
+            api: AuthApi(baseUrl: base),
+            store: MemoryRefreshStore(),
+          ),
+          c = OnboardingController(OnboardingApi(auth));
+      try {
+        await auth.login(email, settings['password'] as String);
+        await c.load();
+        expect(c.failure, isNull);
+        expect(c.granted, isTrue);
+        expect(c.date, '2000-01-01');
+        expect(c.time, '12:30');
+        expect(c.draft!.evidence, isNull);
+        expect(c.eligibility!.satisfied, isFalse);
+        final before = c.draft!.revision;
+        c.birthChanged(knownValue: false);
+        await c.saveBirth();
+        expect(c.failure, isNull);
+        expect(c.draft!.revision, before + 1);
+        expect(c.draft!.birth!.time, isNull);
+        expect(c.eligibility!.state, 'DETAILS_REQUIRED');
+        await auth.logout();
+        expect(c.date, '');
       } finally {
         c.dispose();
         auth.api.dio.close(force: true);
