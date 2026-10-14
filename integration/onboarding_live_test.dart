@@ -15,8 +15,9 @@ void main() {
       mail = String.fromEnvironment('AUTH_TEST_MAIL');
   if (!base.startsWith('http://127.0.0.1:') ||
       base.contains(':3000/') ||
-      !mail.startsWith('http://127.0.0.1:'))
+      !mail.startsWith('http://127.0.0.1:')) {
     throw StateError('Dedicated isolated loopback services required');
+  }
   Future<Object?> get(String url) async {
     final h = HttpClient();
     try {
@@ -125,6 +126,7 @@ void main() {
         expect(c.draft, isNull);
         expect(c.date, '');
         expect(c.eligibility!.state, 'CONSENT_WITHDRAWN');
+        await auth.privacy('export', password: 'synthetic secure passphrase');
         await grant(c, ConsentPurpose.astrology);
         expect(c.draft!.evidence, isNull);
         expect(c.canConfirm, isFalse);
@@ -214,13 +216,15 @@ void main() {
     'same synthetic account shares authoritative Angular state and Flutter mutation',
     () async {
       const file = String.fromEnvironment('D1_CLIENT_ENV');
-      if (!file.startsWith('/tmp/eastalya-d1-client-state-'))
+      if (!file.startsWith('/tmp/eastalya-d1-client-state-')) {
         throw StateError('Private isolated shared account file required');
+      }
       final settings =
           jsonDecode(await File(file).readAsString()) as Map<String, dynamic>;
       final email = settings['email'] as String;
-      if (!email.endsWith('@example.invalid'))
+      if (!email.endsWith('@example.invalid')) {
         throw StateError('Synthetic account required');
+      }
       final auth = AuthSession(
             api: AuthApi(baseUrl: base),
             store: MemoryRefreshStore(),
